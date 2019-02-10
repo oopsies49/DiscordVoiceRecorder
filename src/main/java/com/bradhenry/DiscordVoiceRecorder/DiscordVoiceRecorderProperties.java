@@ -13,7 +13,7 @@ public class DiscordVoiceRecorderProperties {
     @NonNull
     private String commandCharacter;
     @NonNull
-    private String recordingFilePath;
+    private String recordingPath;
 
     @NonNull
     public String getBotToken() {
@@ -33,11 +33,11 @@ public class DiscordVoiceRecorderProperties {
         this.commandCharacter = commandCharacter;
     }
 
-    public String getRecordingFilePath() {
-        return recordingFilePath;
+    public String getRecordingPath() {
+        return recordingPath;
     }
 
-    public void setRecordingFilePath(String recordingFilePath) {
-        this.recordingFilePath = recordingFilePath;
+    public void setRecordingPath(String recordingPath) {
+        this.recordingPath = recordingPath;
     }
 }

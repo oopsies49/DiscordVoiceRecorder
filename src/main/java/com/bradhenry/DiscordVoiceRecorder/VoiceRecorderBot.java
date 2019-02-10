@@ -11,14 +11,11 @@ import javax.security.auth.login.LoginException;
 @Service
 public class VoiceRecorderBot {
 
-    private final DiscordVoiceRecorderProperties properties;
-    private final JDA bot;
-
     @Autowired
     VoiceRecorderBot(DiscordVoiceRecorderProperties properties) {
-        this.properties = properties;
+        JDA bot;
         try {
-            this.bot = new JDABuilder(AccountType.BOT)
+            bot = new JDABuilder(AccountType.BOT)
                     .setAudioEnabled(true)
                     .setAutoReconnect(true)
                     .setToken(properties.getBotToken())
@@ -28,8 +25,8 @@ public class VoiceRecorderBot {
             throw new RuntimeException("Couldn't initialize bot, startup failed", e);
         }
 
-        ChatListener chatListener = new ChatListener(this.properties, this.bot);
-        this.bot.addEventListener(chatListener);
+        ChatListener chatListener = new ChatListener(properties);
+        bot.addEventListener(chatListener);
     }
 
 }

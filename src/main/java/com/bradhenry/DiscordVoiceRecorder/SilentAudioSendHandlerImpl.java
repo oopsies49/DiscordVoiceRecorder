@@ -10,8 +10,7 @@ class SilentAudioSendHandlerImpl implements AudioSendHandler {
 
     @Override
     public byte[] provide20MsAudio() {
-        byte[] silence = {(byte) 0xF8, (byte) 0xFF, (byte) 0xFE};
-        return silence;
+        return new byte[]{(byte) 0xF8, (byte) 0xFF, (byte) 0xFE}; // Opus silence
     }
 
     @Override
