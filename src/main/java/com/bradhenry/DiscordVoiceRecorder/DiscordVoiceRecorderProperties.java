@@ -15,6 +15,10 @@ public class DiscordVoiceRecorderProperties {
     @NonNull
     private String recordingPath;
 
+    private boolean useAWS;
+
+    private String awsBucket;
+
     @NonNull
     public String getBotToken() {
         return botToken;
@@ -39,5 +43,21 @@ public class DiscordVoiceRecorderProperties {
 
     public void setRecordingPath(String recordingPath) {
         this.recordingPath = recordingPath;
+    }
+
+    public boolean isUseAWS() {
+        return useAWS;
+    }
+
+    public void setUseAWS(boolean useAWS) {
+        this.useAWS = useAWS;
+    }
+
+    public String getAwsBucket() {
+        return awsBucket;
+    }
+
+    public void setAwsBucket(String awsBucket) {
+        this.awsBucket = awsBucket;
     }
 }

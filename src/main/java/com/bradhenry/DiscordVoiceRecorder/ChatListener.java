@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class ChatListener extends ListenerAdapter {
@@ -48,12 +49,23 @@ public class ChatListener extends ListenerAdapter {
             return;
         }
 
+        Consumer<File> fileUploader;
+        if (properties.isUseAWS()) {
+            fileUploader = file -> {
+                S3Uploader s3Uploader = new S3Uploader(properties);
+                String url = s3Uploader.uploadFile(file);
+                textChannel.sendMessage(url).submit();
+            };
+        } else {
+            fileUploader = file -> textChannel.sendFile(file, file.getName()).submit();
+        }
+
         try {
             Stream<Path> list = Files.list(new File(properties.getRecordingPath()).toPath());
             list.filter(path -> path.toString().endsWith(".mp3"))
                     .map(Path::toFile)
                     .max(Comparator.comparing(File::lastModified))
-                    .ifPresent(file -> textChannel.sendFile(file, file.getName()).submit());
+                    .ifPresent(fileUploader);
         } catch (IOException e) {
             LOG.error("Uploading recording failed", e);
         }
