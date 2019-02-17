@@ -1,8 +1,8 @@
-package com.bradhenry.DiscordVoiceRecorder;
+package com.bradhenry.discordvoicerecorder.audiohandlers;
 
 import net.dv8tion.jda.core.audio.AudioSendHandler;
 
-class SilentAudioSendHandlerImpl implements AudioSendHandler {
+public class SilentAudioSendHandlerImpl implements AudioSendHandler {
     @Override
     public boolean canProvide() {
         return true;

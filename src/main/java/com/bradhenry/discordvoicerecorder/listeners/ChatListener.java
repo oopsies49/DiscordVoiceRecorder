@@ -1,5 +1,9 @@
-package com.bradhenry.DiscordVoiceRecorder;
+package com.bradhenry.discordvoicerecorder.listeners;
 
+import com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderProperties;
+import com.bradhenry.discordvoicerecorder.audiohandlers.AudioReceiveHandlerImpl;
+import com.bradhenry.discordvoicerecorder.audiohandlers.SilentAudioSendHandlerImpl;
+import com.bradhenry.discordvoicerecorder.aws.S3Uploader;
 import net.dv8tion.jda.core.audio.AudioReceiveHandler;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -62,7 +66,7 @@ public class ChatListener extends ListenerAdapter {
 
         try {
             Stream<Path> list = Files.list(new File(properties.getRecordingPath()).toPath());
-            list.filter(path -> path.toString().endsWith(".mp3"))
+            list.filter(path -> path.toString().endsWith(properties.getRecordingFormat()))
                     .map(Path::toFile)
                     .max(Comparator.comparing(File::lastModified))
                     .ifPresent(fileUploader);
@@ -108,7 +112,7 @@ public class ChatListener extends ListenerAdapter {
         }
 
         try {
-            audioManager.setReceivingHandler(new AudioReceiveHandlerImpl(recordingFile));
+            audioManager.setReceivingHandler(new AudioReceiveHandlerImpl(properties, recordingFile));
             audioManager.setSendingHandler(new SilentAudioSendHandlerImpl());
             audioManager.openAudioConnection(channel);
         } catch (IOException e) {

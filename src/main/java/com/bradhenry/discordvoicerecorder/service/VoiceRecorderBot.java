@@ -1,5 +1,7 @@
-package com.bradhenry.DiscordVoiceRecorder;
+package com.bradhenry.discordvoicerecorder.service;
 
+import com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderProperties;
+import com.bradhenry.discordvoicerecorder.listeners.ChatListener;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;

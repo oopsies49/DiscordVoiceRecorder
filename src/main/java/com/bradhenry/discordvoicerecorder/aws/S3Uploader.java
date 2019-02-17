@@ -1,5 +1,6 @@
-package com.bradhenry.DiscordVoiceRecorder;
+package com.bradhenry.discordvoicerecorder.aws;
 
+import com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderProperties;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;

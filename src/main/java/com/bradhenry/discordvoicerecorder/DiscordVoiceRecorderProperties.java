@@ -1,4 +1,4 @@
-package com.bradhenry.DiscordVoiceRecorder;
+package com.bradhenry.discordvoicerecorder;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
@@ -14,6 +14,8 @@ public class DiscordVoiceRecorderProperties {
     private String commandCharacter;
     @NonNull
     private String recordingPath;
+    @NonNull
+    private String recordingFormat;
 
     private boolean useAWS;
 
@@ -59,5 +61,13 @@ public class DiscordVoiceRecorderProperties {
 
     public void setAwsBucket(String awsBucket) {
         this.awsBucket = awsBucket;
+    }
+
+    public String getRecordingFormat() {
+        return recordingFormat;
+    }
+
+    public void setRecordingFormat(String recordingFormat) {
+        this.recordingFormat = recordingFormat;
     }
 }

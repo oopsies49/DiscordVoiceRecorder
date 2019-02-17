@@ -1,5 +1,6 @@
-package com.bradhenry.DiscordVoiceRecorder;
+package com.bradhenry.discordvoicerecorder.audiohandlers;
 
+import com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderProperties;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.job.FFmpegJob;
@@ -22,8 +23,10 @@ public class AudioReceiveHandlerImpl implements AudioReceiveHandler {
     private final OutputStream outputStream;
     private final File file;
     private boolean canReceive = true;
+    private DiscordVoiceRecorderProperties properties;
 
-    public AudioReceiveHandlerImpl(File file) throws IOException {
+    public AudioReceiveHandlerImpl(DiscordVoiceRecorderProperties properties, File file) throws IOException {
+        this.properties = properties;
         this.file = file;
         this.outputStream = new FileOutputStream(file);
     }
@@ -58,7 +61,7 @@ public class AudioReceiveHandlerImpl implements AudioReceiveHandler {
             outputStream.flush();
             outputStream.close();
             String absolutePath = this.file.getAbsolutePath();
-            String outputPath = absolutePath.substring(0, absolutePath.length() - 3) + "mp3";
+            String outputPath = absolutePath.substring(0, absolutePath.length() - 3) + this.properties.getRecordingFormat();
 
             FFmpegBuilder builder = new FFmpegBuilder();
             builder.setFormat("s16be").addExtraArgs("-ac", "2", "-ar", "48000").setInput(absolutePath).addOutput(outputPath).done();
