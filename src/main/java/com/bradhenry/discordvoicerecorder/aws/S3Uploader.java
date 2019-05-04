@@ -27,7 +27,7 @@ public class S3Uploader {
     }
 
     private String getURL(String bucket, String key) {
-        // https://s3.amazonaws.com/bucket/key
-        return String.format("https://s3.amazonaws.com/%s/%s", bucket, key);
+        // https://bucket.s3.amazonaws.com/key
+        return String.format("https://%s.s3.amazonaws.com/%s", bucket, key);
     }
 }
