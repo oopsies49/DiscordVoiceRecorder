@@ -4,6 +4,7 @@ import com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderProperties;
 import com.bradhenry.discordvoicerecorder.audiohandlers.AudioReceiveHandlerImpl;
 import com.bradhenry.discordvoicerecorder.audiohandlers.SilentAudioSendHandlerImpl;
 import com.bradhenry.discordvoicerecorder.aws.S3Uploader;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.core.audio.AudioReceiveHandler;
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -19,15 +20,25 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class ChatListener extends ListenerAdapter {
     private final DiscordVoiceRecorderProperties properties;
     private static final Log LOG = LogFactory.getLog("ChatListener");
+    private final ExecutorService executorService;
 
     public ChatListener(DiscordVoiceRecorderProperties properties) {
+        this(properties, Executors.newCachedThreadPool());
+    }
+
+    private ChatListener(DiscordVoiceRecorderProperties properties, ExecutorService executorService) {
         this.properties = properties;
+        this.executorService = executorService;
     }
 
     @Override
@@ -53,26 +64,28 @@ public class ChatListener extends ListenerAdapter {
             return;
         }
 
-        Consumer<File> fileUploader;
-        if (properties.isUseAWS()) {
-            fileUploader = file -> {
-                S3Uploader s3Uploader = new S3Uploader(properties);
-                String url = s3Uploader.uploadFile(file);
-                textChannel.sendMessage(url).submit();
-            };
-        } else {
-            fileUploader = file -> textChannel.sendFile(file, file.getName()).submit();
-        }
+        executorService.submit(() -> {
+            Consumer<File> fileUploader;
+            if (properties.isUseAWS()) {
+                fileUploader = file -> {
+                    S3Uploader s3Uploader = new S3Uploader(properties);
+                    String url = s3Uploader.uploadFile(file);
+                    textChannel.sendMessage(url).submit();
+                };
+            } else {
+                fileUploader = file -> textChannel.sendFile(file, file.getName()).submit();
+            }
 
-        try {
-            Stream<Path> list = Files.list(new File(properties.getRecordingPath()).toPath());
-            list.filter(path -> path.toString().endsWith(properties.getRecordingFormat()))
-                    .map(Path::toFile)
-                    .max(Comparator.comparing(File::lastModified))
-                    .ifPresent(fileUploader);
-        } catch (IOException e) {
-            LOG.error("Uploading recording failed", e);
-        }
+            try {
+                Stream<Path> list = Files.list(new File(properties.getRecordingPath()).toPath());
+                list.filter(path -> path.toString().endsWith(properties.getRecordingFormat()))
+                        .map(Path::toFile)
+                        .max(Comparator.comparing(File::lastModified))
+                        .ifPresent(fileUploader);
+            } catch (IOException e) {
+                LOG.error("Uploading recording failed", e);
+            }
+        });
     }
 
     private void endRecordCommand(MessageReceivedEvent event) {
@@ -80,15 +93,17 @@ public class ChatListener extends ListenerAdapter {
             return;
         }
 
-        AudioManager audioManager = event.getMember().getGuild().getAudioManager();
-        AudioReceiveHandler receiveHandler = audioManager.getReceiveHandler();
-        if (receiveHandler instanceof AudioReceiveHandlerImpl) {
-            ((AudioReceiveHandlerImpl) receiveHandler).shutdown();
-        }
+        executorService.submit(() -> {
+            AudioManager audioManager = event.getMember().getGuild().getAudioManager();
+            AudioReceiveHandler receiveHandler = audioManager.getReceiveHandler();
+            if (receiveHandler instanceof AudioReceiveHandlerImpl) {
+                ((AudioReceiveHandlerImpl) receiveHandler).shutdown();
+            }
 
-        audioManager.setSendingHandler(null);
-        audioManager.setReceivingHandler(null);
-        audioManager.closeAudioConnection();
+            audioManager.setSendingHandler(null);
+            audioManager.setReceivingHandler(null);
+            audioManager.closeAudioConnection();
+        });
     }
 
     private void startRecordCommand(MessageReceivedEvent event) {

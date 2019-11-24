@@ -5,6 +5,9 @@ apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
+apply plugin: 'idea'
+
+version = '1.0'
 
 sourceCompatibility = 1.8
 
@@ -39,7 +42,8 @@ dependencies {
 jar {
     enabled = true
     manifest {
-        attributes 'Main-Class': 'com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderApplication'
+        attributes 'Main-Class': 'com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderApplication',
+        'Implementation-Version': version
     }
 }
 
