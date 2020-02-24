@@ -51,3 +51,7 @@ startScripts {
     mainClassName 'com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderApplication'
 }
 
+application {
+    mainClassName 'com.bradhenry.discordvoicerecorder.DiscordVoiceRecorderApplication'
+}
+
